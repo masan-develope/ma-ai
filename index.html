@@ -1,0 +1,1322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0a0a"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black"/>
+<title>MA AI</title>
+<link rel="manifest" href="manifest.json"/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --bg:#0a0a0a;
+  --surface:#111111;
+  --panel:#181818;
+  --border:#2a2a2a;
+  --border-light:#1e1e1e;
+  --text:#ebebeb;
+  --text-2:#888;
+  --text-3:#444;
+  --white:#ffffff;
+  --black:#000000;
+  --radius:14px;
+  --radius-sm:9px;
+  --sidebar:260px;
+  --font:'Inter',sans-serif;
+  --accent:#7c6dff;
+}
+
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font);overflow:hidden;-webkit-font-smoothing:antialiased}
+
+/* ═══════════════════════ LOGIN PAGE ═══════════════════════ */
+#login-page{
+  position:fixed;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;
+  z-index:1000;
+  background:var(--bg);
+}
+
+/* Full screen black banner */
+.login-banner{
+  position:absolute;inset:0;
+  background:#000000;
+  overflow:hidden;
+}
+.login-banner::before{
+  content:'';position:absolute;inset:0;
+  background:radial-gradient(ellipse 60% 50% at 50% 25%,rgba(255,255,255,.04) 0%,transparent 70%);
+}
+.login-banner::after{content:none;}
+/* Subtle particles - white/grey only */
+.login-banner .particle{
+  position:absolute;border-radius:50%;
+  background:rgba(255,255,255,.06);
+  animation:float-p 10s ease-in-out infinite;
+}
+.login-banner .p1{width:220px;height:220px;top:5%;left:55%;filter:blur(70px);animation-delay:0s;}
+.login-banner .p2{width:140px;height:140px;top:35%;left:5%;filter:blur(60px);animation-delay:3s;}
+.login-banner .p3{width:100px;height:100px;top:55%;left:65%;filter:blur(50px);animation-delay:5s;}
+@keyframes float-p{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-18px) scale(1.04);}}
+
+/* Logo area centered on screen */
+.login-top{
+  position:absolute;top:0;left:0;right:0;bottom:260px;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:16px;z-index:2;
+}
+/* Logo tanpa background */
+.login-logo{
+  width:80px;height:80px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:42px;font-weight:800;color:var(--white);
+  text-shadow:0 0 30px rgba(255,255,255,.3);
+  letter-spacing:-2px;
+}
+.login-logo img{
+  width:80px;height:80px;
+  object-fit:contain;
+  filter:drop-shadow(0 0 20px rgba(255,255,255,.25));
+}
+.login-brand{
+  font-size:28px;font-weight:700;letter-spacing:-0.8px;
+  color:var(--white);
+  text-shadow:0 0 30px rgba(124,109,255,.3);
+}
+.login-sub-text{
+  font-size:14px;color:rgba(255,255,255,.45);
+  text-align:center;line-height:1.5;
+}
+
+/* Bottom card */
+.login-bottom{
+  position:relative;z-index:2;
+  width:100%;padding:24px 24px 40px;
+  background:linear-gradient(to top, #000000 75%, transparent);
+  display:flex;flex-direction:column;gap:12px;
+  max-width:420px;
+  align-self:center;
+}
+.google-btn{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:10px;
+  padding:14px 20px;border-radius:var(--radius);
+  background:var(--white);border:none;cursor:pointer;
+  font-size:14px;font-weight:600;color:#1a1a1a;
+  transition:opacity .15s;font-family:var(--font);
+}
+.google-btn:hover{opacity:.92;}
+.google-btn svg{width:18px;height:18px;flex-shrink:0;}
+.google-btn-outline{
+  background:transparent;
+  border:1px solid rgba(255,255,255,.15) !important;
+  color:var(--text) !important;
+  backdrop-filter:blur(8px);
+}
+.login-terms{font-size:11px;color:var(--text-3);text-align:center;margin-top:4px;line-height:1.6;}
+.login-terms a{color:var(--text-2);text-decoration:none;}
+
+/* ═══════════════════════ SETTINGS MODAL ═══════════════════════ */
+#settings-modal{
+  display:none;position:fixed;inset:0;z-index:200;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  align-items:flex-end;justify-content:center;
+}
+#settings-modal.open{display:flex;}
+.settings-sheet{
+  width:100%;max-width:480px;
+  background:var(--panel);border-radius:24px 24px 0 0;
+  border-top:1px solid var(--border);
+  padding:0 0 env(safe-area-inset-bottom,20px);
+  max-height:90dvh;overflow-y:auto;
+  animation:slide-up .25s ease;
+}
+@keyframes slide-up{from{transform:translateY(60px);opacity:0;}to{transform:none;opacity:1;}}
+.settings-handle{
+  width:36px;height:4px;background:var(--border);border-radius:2px;
+  margin:12px auto 0;
+}
+.settings-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px 8px;
+}
+.settings-title{font-size:16px;font-weight:600;}
+.settings-close{background:none;border:none;color:var(--text-3);cursor:pointer;font-size:18px;padding:4px;}
+.settings-close:hover{color:var(--text);}
+
+.settings-avatar-section{
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+  padding:16px 20px 24px;border-bottom:1px solid var(--border-light);
+}
+.settings-avatar{
+  width:72px;height:72px;border-radius:50%;overflow:hidden;
+  background:var(--border);display:flex;align-items:center;justify-content:center;
+  font-size:28px;font-weight:700;color:var(--white);position:relative;
+}
+.settings-avatar img{width:100%;height:100%;object-fit:cover;}
+.settings-avatar-name{font-size:17px;font-weight:600;}
+.settings-avatar-email{font-size:13px;color:var(--text-2);}
+
+.settings-section-label{
+  padding:14px 20px 6px;font-size:11px;font-weight:600;
+  color:var(--text-3);text-transform:uppercase;letter-spacing:.8px;
+}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:13px 20px;border-bottom:1px solid var(--border-light);
+  cursor:pointer;transition:background .1s;
+}
+.settings-row:hover{background:rgba(255,255,255,.03);}
+.settings-row-left{display:flex;align-items:center;gap:12px;}
+.settings-row-icon{
+  width:32px;height:32px;border-radius:8px;background:var(--surface);
+  display:flex;align-items:center;justify-content:center;font-size:15px;
+  flex-shrink:0;border:1px solid var(--border);
+}
+.settings-row-text{font-size:14px;font-weight:500;}
+.settings-row-sub{font-size:12px;color:var(--text-3);margin-top:1px;}
+.settings-row-right{font-size:12px;color:var(--text-3);}
+.settings-badge{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:var(--border);color:var(--text-2);
+}
+.settings-logout-btn{
+  margin:16px 20px;width:calc(100% - 40px);
+  background:transparent;border:1px solid rgba(255,80,80,.3);
+  color:#ff6060;font-size:14px;font-weight:500;
+  padding:12px;border-radius:var(--radius);cursor:pointer;
+  font-family:var(--font);transition:background .15s;
+}
+.settings-logout-btn:hover{background:rgba(255,80,80,.08);}
+
+/* ═══════════════════════ APP LAYOUT ═══════════════════════ */
+#app{display:none;height:100dvh;flex-direction:row;}
+#app.visible{display:flex;}
+
+/* ── SIDEBAR ── */
+#sidebar{
+  width:var(--sidebar);flex-shrink:0;
+  background:var(--surface);border-right:1px solid var(--border-light);
+  display:flex;flex-direction:column;height:100%;
+  transition:transform .25s ease;
+}
+
+.sidebar-header{
+  padding:16px 14px 12px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border-light);
+}
+.sidebar-logo{display:flex;align-items:center;gap:8px;}
+.sidebar-logo-img{
+  width:26px;height:26px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;color:var(--white);flex-shrink:0;
+}
+.sidebar-logo-img img{width:26px;height:26px;object-fit:contain;filter:drop-shadow(0 0 6px rgba(124,109,255,.4));}
+.sidebar-logo-name{font-size:14px;font-weight:700;letter-spacing:-.3px;}
+
+.new-chat-btn{
+  margin:10px;padding:10px 14px;border-radius:var(--radius-sm);
+  background:transparent;border:1px solid var(--border);
+  color:var(--text);font-size:13px;font-weight:500;
+  cursor:pointer;display:flex;align-items:center;gap:8px;
+  transition:background .15s;font-family:var(--font);
+}
+.new-chat-btn:hover{background:var(--panel);}
+.new-chat-btn svg{width:14px;height:14px;opacity:.7;}
+
+.sidebar-section-label{
+  padding:14px 14px 5px;font-size:10px;font-weight:600;
+  color:var(--text-3);text-transform:uppercase;letter-spacing:.9px;
+}
+.chat-history{flex:1;overflow-y:auto;scrollbar-width:none;padding:0 6px;}
+.chat-history::-webkit-scrollbar{display:none;}
+.history-item{
+  padding:8px 10px;border-radius:var(--radius-sm);cursor:pointer;
+  font-size:12.5px;color:var(--text-2);transition:all .1s;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  margin-bottom:1px;
+}
+.history-item:hover{background:var(--panel);color:var(--text);}
+.history-item.active{background:var(--panel);color:var(--text);}
+
+.sidebar-footer{
+  padding:10px;border-top:1px solid var(--border-light);
+}
+.user-profile{
+  display:flex;align-items:center;gap:10px;padding:9px 10px;
+  border-radius:var(--radius-sm);cursor:pointer;transition:background .15s;
+}
+.user-profile:hover{background:var(--panel);}
+.user-avatar{
+  width:30px;height:30px;border-radius:50%;background:var(--border);
+  overflow:hidden;display:flex;align-items:center;justify-content:center;
+  font-size:12px;font-weight:700;color:var(--white);flex-shrink:0;
+}
+.user-avatar img{width:100%;height:100%;object-fit:cover;}
+.user-info{flex:1;min-width:0;}
+.user-name{font-size:12.5px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.user-email{font-size:11px;color:var(--text-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.settings-icon-btn{
+  background:none;border:none;color:var(--text-3);cursor:pointer;
+  font-size:15px;padding:4px;border-radius:5px;transition:color .15s;
+  display:flex;align-items:center;justify-content:center;
+}
+.settings-icon-btn:hover{color:var(--text);}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;min-width:0;height:100%;}
+
+/* ── TOP BAR ── */
+.topbar{
+  padding:10px 16px;display:flex;align-items:center;gap:12px;
+  border-bottom:1px solid var(--border-light);flex-shrink:0;
+  background:var(--bg);
+}
+.topbar-menu{
+  background:none;border:none;color:var(--text-2);cursor:pointer;
+  font-size:18px;padding:4px;border-radius:6px;transition:color .15s;
+  display:none;
+}
+.topbar-menu:hover{color:var(--text);}
+.model-selector{
+  display:flex;align-items:center;gap:6px;padding:5px 12px;
+  background:var(--surface);border:1px solid var(--border);border-radius:20px;
+  cursor:pointer;font-size:13px;font-weight:500;color:var(--text);
+  position:relative;font-family:var(--font);
+  transition:border-color .15s;
+}
+.model-selector:hover{border-color:var(--text-3);}
+.model-dot{width:6px;height:6px;border-radius:50%;background:var(--accent);flex-shrink:0;box-shadow:0 0 6px var(--accent);}
+.model-caret{color:var(--text-3);font-size:10px;margin-left:2px;}
+
+/* model dropdown */
+.model-dropdown{
+  position:absolute;top:calc(100% + 8px);left:0;
+  background:var(--panel);border:1px solid var(--border);
+  border-radius:var(--radius);padding:6px;min-width:220px;
+  z-index:100;display:none;box-shadow:0 12px 40px rgba(0,0,0,.6);
+}
+.model-dropdown.open{display:block;}
+.model-option{
+  padding:10px 12px;border-radius:var(--radius-sm);cursor:pointer;
+  transition:background .1s;display:flex;flex-direction:column;gap:2px;
+}
+.model-option:hover{background:var(--surface);}
+.model-option.selected{background:var(--surface);}
+.model-option-name{font-size:13px;font-weight:600;}
+.model-option-desc{font-size:11px;color:var(--text-3);}
+.model-option-badge{
+  font-size:10px;font-weight:700;padding:2px 7px;border-radius:5px;
+  background:rgba(124,109,255,.15);color:var(--accent);
+  align-self:flex-start;margin-top:2px;border:1px solid rgba(124,109,255,.2);
+}
+
+/* ── CHAT AREA ── */
+#chat{
+  flex:1;overflow-y:auto;padding:0;
+  scrollbar-width:thin;scrollbar-color:var(--border) transparent;
+  display:flex;flex-direction:column;
+}
+#chat::-webkit-scrollbar{width:4px;}
+#chat::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+
+/* welcome — clean, no cards */
+#welcome{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:32px 20px;gap:14px;
+}
+.welcome-logo{
+  width:64px;height:64px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:36px;font-weight:800;color:var(--white);
+  text-shadow:0 0 30px rgba(124,109,255,.5);
+}
+.welcome-logo img{
+  width:64px;height:64px;object-fit:contain;
+  filter:drop-shadow(0 0 20px rgba(124,109,255,.5));
+}
+#welcome h2{
+  font-size:22px;font-weight:600;letter-spacing:-.5px;
+  color:var(--white);text-align:center;
+}
+#welcome .welcome-sub{
+  font-size:14px;color:var(--text-2);text-align:center;
+  max-width:280px;line-height:1.6;
+}
+
+/* messages */
+.msg-wrap{width:100%;padding:16px 0;}
+.msg-wrap.user-wrap{background:transparent;}
+.msg-wrap.ai-wrap{background:transparent;}
+
+.msg-inner{
+  max-width:720px;margin:0 auto;padding:0 20px;
+  display:flex;gap:13px;align-items:flex-start;
+}
+
+/* User avatar (kecil, kanan) */
+.msg-avatar.user-avatar-chat{
+  width:26px;height:26px;border-radius:50%;
+  background:var(--border);flex-shrink:0;overflow:hidden;
+  display:flex;align-items:center;justify-content:center;
+  font-size:11px;font-weight:700;color:var(--white);
+}
+.msg-avatar.user-avatar-chat img{width:100%;height:100%;object-fit:cover;border-radius:50%;}
+
+/* AI response — no avatar, full width */
+.ai-msg-block{
+  max-width:720px;margin:0 auto;padding:0 20px;
+}
+
+/* Logo muncul di bawah setelah selesai */
+.ai-msg-footer{
+  display:flex;align-items:center;gap:8px;
+  margin-top:10px;
+}
+.ai-logo-badge{
+  width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;transform:scale(0.7);
+  transition:opacity .3s ease,transform .3s ease;
+}
+.ai-logo-badge.visible{opacity:1;transform:scale(1);}
+.ai-logo-badge img{width:22px;height:22px;object-fit:contain;}
+.ai-logo-badge-fallback{
+  width:22px;height:22px;border-radius:5px;
+  background:var(--white);color:var(--black);
+  font-size:10px;font-weight:800;
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* AI message content */
+.msg-content{flex:1;min-width:0;font-size:15px;line-height:1.7;color:var(--text);}
+
+/* User message — no background, clean, right-aligned */
+.msg-content.user-content{
+  background:transparent;
+  border:none;
+  padding:0;
+  font-size:15px;
+  color:var(--text);
+  flex:unset;
+  max-width:75%;
+  text-align:left;
+  word-break:break-word;
+}
+
+/* uploaded image in chat */
+.chat-image{
+  max-width:260px;max-height:200px;border-radius:var(--radius-sm);
+  object-fit:cover;margin-bottom:8px;display:block;
+  border:1px solid var(--border);
+}
+
+/* markdown in AI bubble */
+.msg-content p{margin-bottom:12px;}
+.msg-content p:last-child{margin-bottom:0;}
+.msg-content pre{
+  background:#0f0f0f;border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+  overflow-x:auto;overflow-y:visible;
+  margin:12px 0;position:relative;
+}
+.msg-content pre code{
+  font-size:13px;font-family:'JetBrains Mono','Fira Mono',monospace;
+  padding:14px;display:block;
+  white-space:pre;word-break:normal;overflow-wrap:normal;
+  width:max-content;min-width:100%;line-height:1.6;
+}
+.msg-content code:not(pre code){
+  background:var(--panel);color:#c8b8ff;padding:2px 6px;
+  border-radius:4px;font-size:13px;font-family:'JetBrains Mono',monospace;
+}
+.msg-content strong{font-weight:600;color:var(--white);}
+.msg-content ul,.msg-content ol{padding-left:20px;margin-bottom:12px;}
+.msg-content li{margin-bottom:4px;}
+.msg-content h1,.msg-content h2,.msg-content h3{
+  font-weight:600;margin:16px 0 8px;color:var(--white);
+}
+.copy-code-btn{
+  position:absolute;top:8px;right:8px;
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text-3);font-size:11px;padding:3px 8px;
+  border-radius:5px;cursor:pointer;font-family:var(--font);
+  transition:color .15s;
+}
+.copy-code-btn:hover{color:var(--text);}
+
+/* typing */
+.typing-indicator{display:flex;gap:4px;align-items:center;padding:6px 0;}
+.typing-indicator span{
+  width:5px;height:5px;border-radius:50%;background:var(--text-3);
+  animation:tdot 1.2s infinite;
+}
+.typing-indicator span:nth-child(2){animation-delay:.2s;}
+.typing-indicator span:nth-child(3){animation-delay:.4s;}
+@keyframes tdot{0%,80%,100%{opacity:.2}40%{opacity:1}}
+
+/* ── INPUT AREA — glass effect ── */
+#input-wrap{
+  flex-shrink:0;padding:10px 16px 20px;
+  background:transparent;
+}
+.input-box{
+  max-width:720px;margin:0 auto;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:var(--radius);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  box-shadow:0 4px 24px rgba(0,0,0,.3),inset 0 1px 0 rgba(255,255,255,.06);
+  transition:border-color .2s,box-shadow .2s;
+  overflow:hidden;
+}
+.input-box:focus-within{
+  border-color:rgba(124,109,255,.35);
+  box-shadow:0 4px 24px rgba(0,0,0,.3),0 0 0 3px rgba(124,109,255,.08),inset 0 1px 0 rgba(255,255,255,.06);
+}
+
+/* image preview */
+#img-preview-wrap{padding:10px 14px 0;display:none;}
+#img-preview-wrap.visible{display:flex;gap:8px;flex-wrap:wrap;}
+.img-thumb{
+  position:relative;width:56px;height:56px;border-radius:8px;overflow:hidden;
+  border:1px solid var(--border);
+}
+.img-thumb img{width:100%;height:100%;object-fit:cover;}
+.img-thumb-remove{
+  position:absolute;top:2px;right:2px;background:rgba(0,0,0,.8);
+  border:none;color:#fff;font-size:10px;width:15px;height:15px;
+  border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;
+}
+
+textarea#user-input{
+  width:100%;background:transparent;border:none;outline:none;
+  color:var(--text);font-size:14px;padding:14px 16px 10px;
+  resize:none;min-height:52px;max-height:180px;
+  font-family:var(--font);line-height:1.6;scrollbar-width:none;
+}
+textarea#user-input::-webkit-scrollbar{display:none;}
+textarea#user-input::placeholder{color:rgba(255,255,255,.2);}
+
+.input-actions{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:6px 10px 8px;
+}
+.input-left{display:flex;gap:4px;}
+
+/* Upload btn pakai + bukan emoji */
+.upload-btn{
+  background:none;border:none;cursor:pointer;
+  width:30px;height:30px;border-radius:7px;
+  display:flex;align-items:center;justify-content:center;
+  color:rgba(255,255,255,.3);font-size:20px;font-weight:300;line-height:1;
+  transition:background .15s,color .15s;
+}
+.upload-btn:hover{background:rgba(255,255,255,.06);color:rgba(255,255,255,.7);}
+#file-input{display:none;}
+
+.send-btn{
+  width:30px;height:30px;border-radius:7px;
+  background:var(--white);border:none;
+  color:var(--black);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:opacity .15s,transform .1s;
+}
+.send-btn:hover{opacity:.88;transform:scale(1.05);}
+.send-btn:disabled{opacity:.2;cursor:default;transform:none;}
+
+.input-footer{
+  text-align:center;font-size:11px;color:var(--text-3);
+  margin-top:8px;max-width:720px;margin-left:auto;margin-right:auto;
+}
+
+/* ── OVERLAY for sidebar mobile ── */
+#overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:50;
+}
+#overlay.visible{display:block;}
+
+/* ── MOBILE ── */
+@media(max-width:768px){
+  #sidebar{
+    position:fixed;top:0;left:0;bottom:0;z-index:60;
+    transform:translateX(-100%);
+  }
+  #sidebar.open{transform:translateX(0);}
+  .topbar-menu{display:flex;}
+  .msg-inner{padding:0 14px;gap:10px;}
+  .msg-content{font-size:14px;}
+  #input-wrap{padding:8px 12px 24px;}
+}
+
+/* toast */
+.toast{
+  position:fixed;bottom:100px;left:50%;transform:translateX(-50%);
+  background:var(--panel);border:1px solid var(--border);
+  color:var(--text);font-size:13px;padding:8px 16px;border-radius:20px;
+  z-index:999;opacity:0;transition:opacity .2s;pointer-events:none;
+  white-space:nowrap;backdrop-filter:blur(10px);
+}
+.toast.show{opacity:1;}
+
+/* scrollbar for settings */
+.settings-sheet::-webkit-scrollbar{width:0;}
+</style>
+</head>
+<body>
+
+<!-- ══════════════ LOGIN PAGE ══════════════ -->
+<div id="login-page">
+
+  <!-- Full screen gradient banner -->
+  <div class="login-banner">
+    <div class="particle p1"></div>
+    <div class="particle p2"></div>
+    <div class="particle p3"></div>
+  </div>
+
+  <!-- Logo centered -->
+  <div class="login-top">
+    <div class="login-logo">
+      <img src="logo-ma.png" alt="MA AI"
+        onerror="this.style.display='none';this.parentElement.innerHTML='M'"/>
+    </div>
+    <div class="login-brand">MA AI</div>
+    <div class="login-sub-text">AI Assistant dari MA Studio.</div>
+  </div>
+
+  <!-- Bottom buttons -->
+  <div class="login-bottom">
+    <button class="google-btn" onclick="loginWithGoogle()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Masuk dengan Google
+    </button>
+
+    <button class="google-btn google-btn-outline" onclick="loginWithGoogle()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Daftar dengan Google
+    </button>
+
+    <div class="login-terms">
+      Dengan masuk, kamu setuju dengan <a href="#">Ketentuan Layanan</a>
+      dan <a href="#">Kebijakan Privasi</a> MA Studio.
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ SETTINGS MODAL ══════════════ -->
+<div id="settings-modal">
+  <div class="settings-sheet">
+    <div class="settings-handle"></div>
+    <div class="settings-header">
+      <div class="settings-title">Pengaturan</div>
+      <button class="settings-close" onclick="closeSettings()">✕</button>
+    </div>
+
+    <!-- Avatar & identity -->
+    <div class="settings-avatar-section">
+      <div class="settings-avatar" id="settings-avatar-wrap">
+        <img id="settings-avatar-img" src="" alt="" onerror="this.style.display='none'"/>
+        <span id="settings-avatar-fallback"></span>
+      </div>
+      <div class="settings-avatar-name" id="settings-user-name">Pengguna</div>
+      <div class="settings-avatar-email" id="settings-user-email"></div>
+    </div>
+
+    <!-- Account section -->
+    <div class="settings-section-label">Akun</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">👤</div>
+        <div>
+          <div class="settings-row-text">Profil</div>
+          <div class="settings-row-sub">Nama & foto akun Google</div>
+        </div>
+      </div>
+      <div class="settings-row-right">Google ›</div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">🔐</div>
+        <div>
+          <div class="settings-row-text">Keamanan</div>
+          <div class="settings-row-sub">Sesi & autentikasi</div>
+        </div>
+      </div>
+      <div class="settings-row-right">›</div>
+    </div>
+
+    <!-- App section -->
+    <div class="settings-section-label">Aplikasi</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">🤖</div>
+        <div>
+          <div class="settings-row-text">Model AI</div>
+          <div class="settings-row-sub" id="settings-model-sub">MA Nova</div>
+        </div>
+      </div>
+      <div class="settings-badge">Aktif</div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">💬</div>
+        <div>
+          <div class="settings-row-text">Riwayat Chat</div>
+          <div class="settings-row-sub" id="settings-history-sub">0 percakapan</div>
+        </div>
+      </div>
+      <div class="settings-row-right" style="cursor:pointer;color:#ff6060;font-size:12px" onclick="clearHistory()">Hapus</div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">🌙</div>
+        <div>
+          <div class="settings-row-text">Tampilan</div>
+          <div class="settings-row-sub">Mode gelap</div>
+        </div>
+      </div>
+      <div class="settings-badge">Aktif</div>
+    </div>
+
+    <!-- Info -->
+    <div class="settings-section-label">Tentang</div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">✦</div>
+        <div>
+          <div class="settings-row-text">MA AI</div>
+          <div class="settings-row-sub">Versi 1.0.0 · MA Studio</div>
+        </div>
+      </div>
+    </div>
+    <div class="settings-row">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">📄</div>
+        <div>
+          <div class="settings-row-text">Ketentuan Layanan</div>
+        </div>
+      </div>
+      <div class="settings-row-right">›</div>
+    </div>
+    <div class="settings-row" style="border-bottom:none">
+      <div class="settings-row-left">
+        <div class="settings-row-icon">🔒</div>
+        <div>
+          <div class="settings-row-text">Kebijakan Privasi</div>
+        </div>
+      </div>
+      <div class="settings-row-right">›</div>
+    </div>
+
+    <button class="settings-logout-btn" onclick="logout()">Keluar dari Akun</button>
+  </div>
+</div>
+
+<!-- ══════════════ APP ══════════════ -->
+<div id="app">
+
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">
+        <div class="sidebar-logo-img">
+          <img src="logo-ma.png" alt="MA" onerror="this.parentElement.innerHTML='M'"/>
+        </div>
+        <span class="sidebar-logo-name">MA AI</span>
+      </div>
+      <button class="settings-icon-btn" onclick="closeSidebar()" style="display:none" id="sidebar-close">✕</button>
+    </div>
+
+    <button class="new-chat-btn" onclick="newChat()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></svg>
+      Chat Baru
+    </button>
+
+    <div class="sidebar-section-label">Riwayat</div>
+    <div class="chat-history" id="chat-history"></div>
+
+    <div class="sidebar-footer">
+      <div class="user-profile" onclick="openSettings()">
+        <div class="user-avatar" id="sidebar-avatar">
+          <img id="sidebar-avatar-img" src="" alt="" onerror="this.style.display='none'"/>
+          <span id="sidebar-avatar-fallback"></span>
+        </div>
+        <div class="user-info">
+          <div class="user-name" id="sidebar-name">Pengguna</div>
+          <div class="user-email" id="sidebar-email"></div>
+        </div>
+        <button class="settings-icon-btn" onclick="event.stopPropagation();openSettings()" title="Pengaturan">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- OVERLAY -->
+  <div id="overlay" onclick="closeSidebar()"></div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <button class="topbar-menu" onclick="toggleSidebar()">☰</button>
+
+      <!-- Model selector -->
+      <div style="position:relative">
+        <div class="model-selector" onclick="toggleModelDropdown()">
+          <span class="model-dot"></span>
+          <span id="model-label">MA Nova</span>
+          <span class="model-caret">▾</span>
+        </div>
+        <div class="model-dropdown" id="model-dropdown">
+          <div class="model-option" onclick="selectModel('ma-spark','MA Spark')">
+            <div class="model-option-name">MA Spark</div>
+            <div class="model-option-badge">Cepat</div>
+            <div class="model-option-desc">Ringan & responsif, cocok untuk tugas sehari-hari</div>
+          </div>
+          <div class="model-option selected" onclick="selectModel('ma-nova','MA Nova')">
+            <div class="model-option-name">MA Nova</div>
+            <div class="model-option-badge">Seimbang</div>
+            <div class="model-option-desc">Pintar & efisien, ideal untuk coding & analisis</div>
+          </div>
+          <div class="model-option" onclick="selectModel('ma-apex','MA Apex')">
+            <div class="model-option-name">MA Apex</div>
+            <div class="model-option-badge">Terkuat</div>
+            <div class="model-option-desc">Paling cerdas, untuk tugas kompleks & mendalam</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CHAT -->
+    <div id="chat">
+      <div id="welcome">
+        <div class="welcome-logo">
+          <img src="logo-ma.png" alt="MA" onerror="this.style.display='none';this.parentElement.innerHTML='M'"/>
+        </div>
+        <h2 id="welcome-title">Halo!</h2>
+        <p class="welcome-sub" id="welcome-sub">Ada yang bisa MA AI bantu hari ini?</p>
+      </div>
+    </div>
+
+    <!-- INPUT -->
+    <div id="input-wrap">
+      <div class="input-box">
+        <div id="img-preview-wrap"></div>
+        <textarea id="user-input" placeholder="Tanya MA AI..." rows="1"></textarea>
+        <div class="input-actions">
+          <div class="input-left">
+            <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Upload gambar">+</button>
+            <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(this)"/>
+          </div>
+          <button class="send-btn" id="send-btn" onclick="sendMessage()">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="input-footer">MA AI bisa salah. Selalu verifikasi informasi penting.</div>
+    </div>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ══════════════════════════════════
+// CONFIG
+// ══════════════════════════════════
+const GOOGLE_CLIENT_ID = 'GANTI_DENGAN_CLIENT_ID_GOOGLE_MU';
+
+// ══════════════════════════════════
+// STATE
+// ══════════════════════════════════
+let currentUser = null;
+let history = [];
+let pendingImages = [];
+let isLoading = false;
+let currentModel = 'ma-nova';
+let chatHistories = JSON.parse(localStorage.getItem('ma-histories') || '[]');
+let currentChatId = null;
+
+const MODEL_MAP = {
+  'ma-spark': 'claude-haiku-4-5-20251001',
+  'ma-nova':  'claude-sonnet-4-6',
+  'ma-apex':  'claude-sonnet-4-6'
+};
+
+const SYSTEM_PROMPT = `Kamu adalah MA AI, asisten AI cerdas dari MA Studio. Kamu ramah, sangat pintar, dan ahli mendalam dalam coding terutama Lua/Luau (Roblox), JavaScript, TypeScript, Python, dan pemrograman umum. Kamu bisa membuat script lengkap, debug kode, menjelaskan konsep, dan membantu berbagai tugas. Kamu juga bisa bantu dengan pertanyaan umum, analisis, dan penulisan. Jawab dalam bahasa yang sama dengan user (Indonesia atau Inggris). Selalu gunakan markdown untuk format kode dengan backtick fence yang tepat seperti \`\`\`lua, \`\`\`js, \`\`\`py, dll. Untuk file yang bisa diunduh, buat kontennya lengkap dan siap pakai.`;
+
+// ══════════════════════════════════
+// GREETING REAL-TIME
+// ══════════════════════════════════
+function getGreeting() {
+  const h = new Date().getHours();
+  if (h >= 5 && h < 11) return 'Selamat pagi';
+  if (h >= 11 && h < 15) return 'Selamat siang';
+  if (h >= 15 && h < 18) return 'Selamat sore';
+  return 'Selamat malam';
+}
+
+// ══════════════════════════════════
+// GOOGLE LOGIN
+// ══════════════════════════════════
+function loginWithGoogle() {
+  if (GOOGLE_CLIENT_ID === 'GANTI_DENGAN_CLIENT_ID_GOOGLE_MU') {
+    demoLogin();
+    return;
+  }
+  const client = google.accounts.oauth2.initTokenClient({
+    client_id: GOOGLE_CLIENT_ID,
+    scope: 'profile email',
+    callback: async (res) => {
+      if (res.access_token) {
+        const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${res.access_token}` }
+        }).then(r => r.json());
+        setUser({ name: info.name, email: info.email, picture: info.picture });
+      }
+    }
+  });
+  client.requestAccessToken();
+}
+
+function demoLogin() {
+  setUser({ name: 'Pengguna MA', email: 'demo@mastudio.id', picture: '' });
+}
+
+function setUser(user) {
+  currentUser = user;
+  localStorage.setItem('ma-user', JSON.stringify(user));
+
+  // sidebar
+  document.getElementById('sidebar-name').textContent = user.name;
+  document.getElementById('sidebar-email').textContent = user.email;
+  if (user.picture) {
+    document.getElementById('sidebar-avatar-img').src = user.picture;
+  } else {
+    document.getElementById('sidebar-avatar-fallback').textContent = user.name.charAt(0).toUpperCase();
+  }
+
+  // settings
+  document.getElementById('settings-user-name').textContent = user.name;
+  document.getElementById('settings-user-email').textContent = user.email;
+  if (user.picture) {
+    document.getElementById('settings-avatar-img').src = user.picture;
+  } else {
+    document.getElementById('settings-avatar-fallback').textContent = user.name.charAt(0).toUpperCase();
+  }
+
+  // welcome greeting
+  const first = user.name.split(' ')[0];
+  document.getElementById('welcome-title').textContent = `${getGreeting()}, ${first}!`;
+
+  // show app
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('app').classList.add('visible');
+
+  renderHistoryList();
+}
+
+function logout() {
+  localStorage.removeItem('ma-user');
+  currentUser = null;
+  history = [];
+  pendingImages = [];
+  closeSettings();
+  document.getElementById('login-page').style.display = 'flex';
+  document.getElementById('app').classList.remove('visible');
+  document.getElementById('chat').innerHTML = '';
+  rebuildWelcome();
+}
+
+// ══════════════════════════════════
+// SETTINGS
+// ══════════════════════════════════
+function openSettings() {
+  closeSidebar();
+  // update history count
+  document.getElementById('settings-history-sub').textContent = chatHistories.length + ' percakapan';
+  document.getElementById('settings-model-sub').textContent = document.getElementById('model-label').textContent;
+  document.getElementById('settings-modal').classList.add('open');
+}
+function closeSettings() {
+  document.getElementById('settings-modal').classList.remove('open');
+}
+document.getElementById('settings-modal').addEventListener('click', function(e){
+  if (e.target === this) closeSettings();
+});
+
+function clearHistory() {
+  if (!confirm('Hapus semua riwayat chat?')) return;
+  chatHistories = [];
+  localStorage.removeItem('ma-histories');
+  currentChatId = null;
+  renderHistoryList();
+  document.getElementById('settings-history-sub').textContent = '0 percakapan';
+  showToast('Riwayat dihapus');
+}
+
+// ══════════════════════════════════
+// INIT
+// ══════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  const saved = localStorage.getItem('ma-user');
+  if (saved) setUser(JSON.parse(saved));
+
+  const ta = document.getElementById('user-input');
+  ta.addEventListener('input', () => {
+    ta.style.height = 'auto';
+    ta.style.height = Math.min(ta.scrollHeight, 180) + 'px';
+  });
+  ta.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+  });
+
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.model-selector') && !e.target.closest('.model-dropdown')) {
+      document.getElementById('model-dropdown').classList.remove('open');
+    }
+  });
+
+  if (window.innerWidth <= 768) {
+    document.getElementById('sidebar-close').style.display = 'flex';
+  }
+});
+
+// ══════════════════════════════════
+// SIDEBAR
+// ══════════════════════════════════
+function toggleSidebar() {
+  const sb = document.getElementById('sidebar');
+  const ov = document.getElementById('overlay');
+  sb.classList.toggle('open');
+  ov.classList.toggle('visible');
+}
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('visible');
+}
+
+// ══════════════════════════════════
+// MODEL
+// ══════════════════════════════════
+function toggleModelDropdown() {
+  document.getElementById('model-dropdown').classList.toggle('open');
+}
+function selectModel(id, label) {
+  currentModel = id;
+  document.getElementById('model-label').textContent = label;
+  document.querySelectorAll('.model-option').forEach(o => o.classList.remove('selected'));
+  event.currentTarget.classList.add('selected');
+  document.getElementById('model-dropdown').classList.remove('open');
+}
+
+// ══════════════════════════════════
+// IMAGE UPLOAD
+// ══════════════════════════════════
+function handleImageUpload(input) {
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingImages.push({ file, dataUrl: e.target.result });
+      renderImagePreviews();
+    };
+    reader.readAsDataURL(file);
+  });
+  input.value = '';
+}
+
+function renderImagePreviews() {
+  const wrap = document.getElementById('img-preview-wrap');
+  wrap.innerHTML = '';
+  if (pendingImages.length === 0) { wrap.classList.remove('visible'); return; }
+  wrap.classList.add('visible');
+  pendingImages.forEach((img, i) => {
+    const div = document.createElement('div');
+    div.className = 'img-thumb';
+    div.innerHTML = `<img src="${img.dataUrl}"/><button class="img-thumb-remove" onclick="removeImage(${i})">✕</button>`;
+    wrap.appendChild(div);
+  });
+}
+
+function removeImage(i) {
+  pendingImages.splice(i, 1);
+  renderImagePreviews();
+}
+
+// ══════════════════════════════════
+// CHAT HISTORY
+// ══════════════════════════════════
+function newChat() {
+  if (history.length > 0) saveCurrentChat();
+  history = [];
+  pendingImages = [];
+  currentChatId = null;
+  renderImagePreviews();
+  document.getElementById('chat').innerHTML = '';
+  rebuildWelcome();
+  closeSidebar();
+}
+
+function saveCurrentChat() {
+  if (history.length === 0) return;
+  const firstMsg = history[0].content;
+  const title = (typeof firstMsg === 'string' ? firstMsg : firstMsg?.[0]?.text || 'Chat').substring(0, 40);
+  const id = currentChatId || Date.now().toString();
+  currentChatId = id;
+  const existing = chatHistories.findIndex(c => c.id === id);
+  const item = { id, title, history: JSON.parse(JSON.stringify(history)), ts: Date.now() };
+  if (existing >= 0) chatHistories[existing] = item;
+  else chatHistories.unshift(item);
+  chatHistories = chatHistories.slice(0, 50);
+  localStorage.setItem('ma-histories', JSON.stringify(chatHistories));
+  renderHistoryList();
+}
+
+function loadChat(id) {
+  if (history.length > 0) saveCurrentChat();
+  const item = chatHistories.find(c => c.id === id);
+  if (!item) return;
+  currentChatId = id;
+  history = item.history;
+  document.getElementById('chat').innerHTML = '';
+  history.forEach(msg => {
+    if (msg.role === 'user') {
+      appendUserMessage(typeof msg.content === 'string' ? msg.content : msg.content.find(c=>c.type==='text')?.text || '', []);
+    } else {
+      appendAIMessage(typeof msg.content === 'string' ? msg.content : msg.content.find(c=>c.type==='text')?.text || '');
+    }
+  });
+  closeSidebar();
+}
+
+function renderHistoryList() {
+  const el = document.getElementById('chat-history');
+  el.innerHTML = '';
+  if (chatHistories.length === 0) {
+    el.innerHTML = '<div style="padding:8px 14px;font-size:12px;color:var(--text-3)">Belum ada riwayat</div>';
+    return;
+  }
+  chatHistories.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'history-item' + (c.id === currentChatId ? ' active' : '');
+    div.textContent = c.title || 'Chat';
+    div.onclick = () => loadChat(c.id);
+    el.appendChild(div);
+  });
+}
+
+function rebuildWelcome() {
+  const chat = document.getElementById('chat');
+  const firstName = currentUser ? currentUser.name.split(' ')[0] : '';
+  const greeting = getGreeting();
+  chat.innerHTML = `
+  <div id="welcome">
+    <div class="welcome-logo"><img src="logo-ma.png" alt="MA" onerror="this.style.display='none';this.parentElement.innerHTML='M'"/></div>
+    <h2>${greeting}${firstName ? ', '+firstName : ''}!</h2>
+    <p class="welcome-sub">Ada yang bisa MA AI bantu hari ini?</p>
+  </div>`;
+}
+
+// ══════════════════════════════════
+// SEND MESSAGE
+// ══════════════════════════════════
+async function sendMessage() {
+  const ta = document.getElementById('user-input');
+  const text = ta.value.trim();
+  if ((!text && pendingImages.length === 0) || isLoading) return;
+
+  const imgs = [...pendingImages];
+  pendingImages = [];
+  renderImagePreviews();
+
+  const welcome = document.getElementById('welcome');
+  if (welcome) welcome.remove();
+
+  ta.value = '';
+  ta.style.height = 'auto';
+
+  isLoading = true;
+  document.getElementById('send-btn').disabled = true;
+
+  appendUserMessage(text, imgs);
+
+  let userContent;
+  if (imgs.length > 0) {
+    userContent = [];
+    imgs.forEach(img => {
+      const b64 = img.dataUrl.split(',')[1];
+      const mime = img.file.type || 'image/png';
+      userContent.push({ type: 'image', source: { type: 'base64', media_type: mime, data: b64 } });
+    });
+    if (text) userContent.push({ type: 'text', text });
+  } else {
+    userContent = text;
+  }
+
+  history.push({ role: 'user', content: userContent });
+
+  const typingId = appendTyping();
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: MODEL_MAP[currentModel] || 'claude-sonnet-4-6',
+        max_tokens: 8096,
+        system: SYSTEM_PROMPT,
+        messages: history
+      })
+    });
+    const data = await res.json();
+    removeEl(typingId);
+
+    if (data.content) {
+      const reply = data.content.map(b => b.text || '').join('');
+      history.push({ role: 'assistant', content: reply });
+      appendAIMessage(reply);
+      saveCurrentChat();
+    } else {
+      appendAIMessage('⚠️ ' + (data.error?.message || 'Gagal mendapat respons.'));
+    }
+  } catch(err) {
+    removeEl(typingId);
+    appendAIMessage('⚠️ Koneksi gagal: ' + err.message);
+  }
+
+  isLoading = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ══════════════════════════════════
+// RENDER MESSAGES
+// ══════════════════════════════════
+function appendUserMessage(text, imgs) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap user-wrap';
+
+  let imgHtml = imgs.map(i => `<img class="chat-image" src="${i.dataUrl}" alt="upload"/>`).join('');
+
+  wrap.innerHTML = `
+    <div class="msg-inner" style="justify-content:flex-end;align-items:flex-end">
+      <div class="msg-content user-content">
+        ${imgHtml}
+        ${text ? escHtml(text).replace(/\n/g,'<br>') : ''}
+      </div>
+    </div>`;
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function appendAIMessage(text) {
+  const chat = document.getElementById('chat');
+  const wrap = document.createElement('div');
+  wrap.className = 'msg-wrap ai-wrap';
+
+  wrap.innerHTML = `
+    <div class="ai-msg-block">
+      <div class="msg-content">${renderMd(text)}</div>
+      <div class="ai-msg-footer">
+        <div class="ai-logo-badge" id="ai-badge-${Date.now()}">
+          <img src="logo-ma.png" alt="MA"
+            onerror="this.parentElement.innerHTML='<div class=\\'ai-logo-badge-fallback\\'>M</div>'"/>
+        </div>
+      </div>
+    </div>`;
+  chat.appendChild(wrap);
+
+  // highlight code blocks
+  wrap.querySelectorAll('pre code').forEach(block => {
+    hljs.highlightElement(block);
+    const pre = block.parentElement;
+    const btn = document.createElement('button');
+    btn.className = 'copy-code-btn';
+    btn.textContent = 'salin';
+    btn.onclick = () => { navigator.clipboard.writeText(block.innerText); btn.textContent = 'tersalin!'; setTimeout(()=>btn.textContent='salin',1500); };
+    pre.appendChild(btn);
+  });
+
+  // Logo muncul setelah render selesai (animasi pop-in)
+  const badge = wrap.querySelector('.ai-logo-badge');
+  requestAnimationFrame(() => {
+    setTimeout(() => { if(badge) badge.classList.add('visible'); }, 80);
+  });
+
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function appendTyping() {
+  const chat = document.getElementById('chat');
+  const id = 'typing-' + Date.now();
+  const wrap = document.createElement('div');
+  wrap.id = id;
+  wrap.className = 'msg-wrap ai-wrap';
+  wrap.innerHTML = `<div class="ai-msg-block"><div class="msg-content"><div class="typing-indicator"><span></span><span></span><span></span></div></div></div>`;
+  chat.appendChild(wrap);
+  chat.scrollTop = chat.scrollHeight;
+  return id;
+}
+
+function removeEl(id) { document.getElementById(id)?.remove(); }
+
+// ══════════════════════════════════
+// MARKDOWN RENDERER
+// ══════════════════════════════════
+function renderMd(text) {
+  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
+    `<pre><code class="${lang}">${escHtml(code.trim())}</code></pre>`);
+  text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
+  text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+  text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+  text = text.replace(/^[\-\*] (.+)$/gm, '<li>$1</li>');
+  text = text.replace(/(<li>.*<\/li>)/s, '<ul>$1</ul>');
+  text = text.split(/\n\n+/).map(p => {
+    p = p.trim();
+    if (!p || p.startsWith('<')) return p;
+    return `<p>${p.replace(/\n/g,'<br>')}</p>`;
+  }).join('');
+  return text;
+}
+
+function escHtml(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ══════════════════════════════════
+// TOAST
+// ══════════════════════════════════
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2000);
+}
+
+// ══════════════════════════════════
+// PWA
+// ══════════════════════════════════
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+</script>
+</body>
+</html>
