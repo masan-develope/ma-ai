@@ -1055,36 +1055,33 @@ function getGreeting() {
 // GOOGLE LOGIN
 // ══════════════════════════════════
 function loginWithGoogle() {
-  if (GOOGLE_CLIENT_ID === 'GANTI_DENGAN_CLIENT_ID_GOOGLE_MU') {
-    demoLogin();
-    return;
-  }
   const client = google.accounts.oauth2.initTokenClient({
     client_id: GOOGLE_CLIENT_ID,
     scope: 'profile email',
     callback: async (res) => {
       if (res.access_token) {
-        const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${res.access_token}` }
-        }).then(r => r.json());
-        localStorage.setItem('ma-google-token', res.access_token);
-        setUser({ name: info.name, email: info.email, picture: info.picture });
+        try {
+          const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+            headers: { Authorization: `Bearer ${res.access_token}` }
+          }).then(r => r.json());
+          if (!info.email) throw new Error('no email');
+          localStorage.setItem('ma-google-token', res.access_token);
+          localStorage.setItem('ma-google-token-exp', Date.now() + 3500 * 1000); // ~58 menit
+          setUser({ name: info.name, email: info.email, picture: info.picture || '' });
+        } catch(e) {
+          showToast('Login gagal, coba lagi');
+        }
       }
     }
   });
   client.requestAccessToken();
 }
 
-function demoLogin() {
-  setUser({ name: 'Pengguna MA', email: 'demo@mastudio.id', picture: '' });
-}
-
 function setUser(user) {
   // Cek apakah user dibanned
   const banned = JSON.parse(localStorage.getItem('ma-banned-users') || '[]');
   if (banned.some(b => b.email === user.email)) {
-    localStorage.removeItem('ma-user');
-    localStorage.removeItem('ma-google-token');
+    clearSession();
     setTimeout(() => {
       alert('Akun kamu telah diblokir oleh admin MA Studio.\nBuka ' + location.origin + '?appeal=1 untuk mengajukan banding.');
     }, 300);
@@ -1134,9 +1131,14 @@ function setUser(user) {
   }
 }
 
-function logout() {
+function clearSession() {
   localStorage.removeItem('ma-user');
   localStorage.removeItem('ma-google-token');
+  localStorage.removeItem('ma-google-token-exp');
+}
+
+function logout() {
+  clearSession();
   currentUser = null;
   history = [];
   pendingImages = [];
@@ -1178,23 +1180,21 @@ function clearHistory() {
 // INIT
 // ══════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  // Cek apakah ada sesi Google yang masih valid (token disimpan)
+  // Cek sesi — hanya restore kalau token belum expired
   const savedToken = localStorage.getItem('ma-google-token');
-  const savedUser = localStorage.getItem('ma-user');
-  if (savedToken && savedUser) {
-    // Verifikasi token masih valid ke Google
-    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: { Authorization: `Bearer ${savedToken}` }
-    }).then(r => {
-      if (r.ok) return r.json();
-      throw new Error('token expired');
-    }).then(info => {
-      setUser({ name: info.name, email: info.email, picture: info.picture });
-    }).catch(() => {
-      // Token expired — hapus dan paksa login ulang
-      localStorage.removeItem('ma-google-token');
-      localStorage.removeItem('ma-user');
-    });
+  const savedExp   = parseInt(localStorage.getItem('ma-google-token-exp') || '0');
+  const savedUser  = localStorage.getItem('ma-user');
+
+  if (savedToken && savedUser && Date.now() < savedExp) {
+    // Token masih valid, restore sesi tanpa hit Google API
+    try {
+      setUser(JSON.parse(savedUser));
+    } catch(e) {
+      clearSession();
+    }
+  } else {
+    // Token tidak ada / sudah expired — bersihkan dan paksa login ulang
+    clearSession();
   }
 
   const ta = document.getElementById('user-input');
