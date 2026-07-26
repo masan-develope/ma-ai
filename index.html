@@ -857,9 +857,9 @@ let chatHistories = JSON.parse(localStorage.getItem('ma-histories') || '[]');
 let currentChatId = null;
 
 const MODEL_MAP = {
-  'ma-spark': 'claude-haiku-4-5-20251001',
-  'ma-nova':  'claude-sonnet-4-6',
-  'ma-apex':  'claude-sonnet-4-6'
+  'ma-spark': 'gemini-2.0-flash',
+  'ma-nova':  'gemini-2.5-pro',
+  'ma-apex':  'gemini-2.5-pro'
 };
 
 const SYSTEM_PROMPT = `Kamu adalah MA AI, asisten AI cerdas dari MA Studio. Kamu ramah, sangat pintar, dan ahli mendalam dalam coding terutama Lua/Luau (Roblox), JavaScript, TypeScript, Python, dan pemrograman umum. Kamu bisa membuat script lengkap, debug kode, menjelaskan konsep, dan membantu berbagai tugas. Kamu juga bisa bantu dengan pertanyaan umum, analisis, dan penulisan. Jawab dalam bahasa yang sama dengan user (Indonesia atau Inggris). Selalu gunakan markdown untuk format kode dengan backtick fence yang tepat seperti \`\`\`lua, \`\`\`js, \`\`\`py, dll. Untuk file yang bisa diunduh, buat kontennya lengkap dan siap pakai.`;
