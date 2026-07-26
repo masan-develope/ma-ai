@@ -1112,13 +1112,15 @@ function loadChat(id) {
   currentChatId = id;
   history = item.history;
   document.getElementById('chat').innerHTML = '';
-  for (const msg of history) {
-    if (msg.role === 'user') {
-      appendUserMessage(typeof msg.content === 'string' ? msg.content : msg.content.find(c=>c.type==='text')?.text || '', []);
-    } else {
-      await appendAIMessage(typeof msg.content === 'string' ? msg.content : msg.content.find(c=>c.type==='text')?.text || '');
+  (async () => {
+    for (const msg of history) {
+      if (msg.role === 'user') {
+        appendUserMessage(typeof msg.content === 'string' ? msg.content : msg.content.find(c=>c.type==='text')?.text || '', []);
+      } else {
+        await appendAIMessage(typeof msg.content === 'string' ? msg.content : msg.content.find(c=>c.type==='text')?.text || '');
+      }
     }
-  }
+  })();
   closeSidebar();
 }
 
