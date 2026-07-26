@@ -841,6 +841,10 @@ textarea#user-input::placeholder{color:rgba(255,255,255,.2);}
 // ══════════════════════════════════
 const GOOGLE_CLIENT_ID = 'GANTI_DENGAN_CLIENT_ID_GOOGLE_MU';
 
+// Ganti dengan URL Worker kamu setelah deploy ke Cloudflare
+// Contoh: 'https://ma-ai.username.workers.dev'
+const WORKER_URL = 'https://ma-ai.muhamadandisaputra2005.workers.dev';
+
 // ══════════════════════════════════
 // STATE
 // ══════════════════════════════════
@@ -1173,7 +1177,7 @@ async function sendMessage() {
   const typingId = appendTyping();
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
