@@ -586,6 +586,132 @@ textarea#user-input::placeholder{color:rgba(255,255,255,.2);}
 
 /* scrollbar for settings */
 .settings-sheet::-webkit-scrollbar{width:0;}
+
+/* ═══════════════════════ FOUNDER PANEL ═══════════════════════ */
+#founder-panel{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.85);backdrop-filter:blur(12px);
+  align-items:center;justify-content:center;padding:16px;
+}
+#founder-panel.open{display:flex;}
+.founder-sheet{
+  width:100%;max-width:560px;max-height:90dvh;
+  background:#0f0f0f;border:1px solid #2a2a2a;border-radius:20px;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 24px 80px rgba(0,0,0,.8);
+}
+.founder-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:16px 20px;border-bottom:1px solid #1e1e1e;flex-shrink:0;
+}
+.founder-title{font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+.founder-badge{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;
+  background:rgba(255,180,0,.12);color:#ffb400;border:1px solid rgba(255,180,0,.25);
+}
+.founder-close{background:none;border:none;color:#444;cursor:pointer;font-size:18px;padding:4px;}
+.founder-close:hover{color:#888;}
+
+.founder-tabs{
+  display:flex;border-bottom:1px solid #1e1e1e;flex-shrink:0;
+}
+.founder-tab{
+  flex:1;padding:10px;font-size:12px;font-weight:600;
+  background:none;border:none;color:#444;cursor:pointer;
+  border-bottom:2px solid transparent;transition:all .15s;font-family:var(--font);
+}
+.founder-tab.active{color:var(--text);border-bottom-color:var(--accent);}
+
+.founder-body{flex:1;overflow-y:auto;padding:16px 20px;display:flex;flex-direction:column;gap:12px;}
+
+/* Search bar */
+.founder-search{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid #2a2a2a;
+  border-radius:10px;padding:9px 14px;color:var(--text);
+  font-size:13px;font-family:var(--font);outline:none;
+}
+.founder-search:focus{border-color:rgba(124,109,255,.4);}
+.founder-search::placeholder{color:#333;}
+
+/* User list */
+.founder-user-card{
+  background:rgba(255,255,255,.03);border:1px solid #1e1e1e;
+  border-radius:12px;padding:14px;display:flex;align-items:center;gap:12px;
+  transition:border-color .15s;
+}
+.founder-user-card:hover{border-color:#2a2a2a;}
+.founder-user-avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:#1e1e1e;display:flex;align-items:center;justify-content:center;
+  font-size:14px;font-weight:700;color:var(--white);flex-shrink:0;overflow:hidden;
+}
+.founder-user-avatar img{width:100%;height:100%;object-fit:cover;}
+.founder-user-info{flex:1;min-width:0;}
+.founder-user-name{font-size:13px;font-weight:600;margin-bottom:2px;}
+.founder-user-email{font-size:11px;color:#444;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.founder-user-status{
+  font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;margin-top:4px;
+  display:inline-block;
+}
+.status-active{background:rgba(0,200,100,.1);color:#00c864;border:1px solid rgba(0,200,100,.2);}
+.status-banned{background:rgba(255,60,60,.1);color:#ff4444;border:1px solid rgba(255,60,60,.2);}
+.founder-user-actions{display:flex;gap:6px;flex-shrink:0;}
+.founder-action-btn{
+  padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;
+  cursor:pointer;border:none;font-family:var(--font);transition:opacity .15s;
+}
+.founder-action-btn:hover{opacity:.8;}
+.btn-ban{background:rgba(255,60,60,.15);color:#ff4444;}
+.btn-unban{background:rgba(0,200,100,.15);color:#00c864;}
+.btn-email{background:rgba(124,109,255,.15);color:var(--accent);}
+
+/* Ban modal */
+#ban-modal{
+  display:none;position:fixed;inset:0;z-index:600;
+  background:rgba(0,0,0,.7);backdrop-filter:blur(8px);
+  align-items:center;justify-content:center;padding:16px;
+}
+#ban-modal.open{display:flex;}
+.ban-sheet{
+  width:100%;max-width:400px;background:#111;border:1px solid #2a2a2a;
+  border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;
+}
+.ban-title{font-size:14px;font-weight:700;}
+.ban-subtitle{font-size:12px;color:#555;margin-top:-8px;}
+.ban-input{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid #2a2a2a;
+  border-radius:10px;padding:10px 14px;color:var(--text);
+  font-size:13px;font-family:var(--font);outline:none;resize:none;min-height:80px;
+}
+.ban-input:focus{border-color:rgba(124,109,255,.4);}
+.ban-actions{display:flex;gap:8px;}
+.ban-confirm-btn{
+  flex:1;padding:10px;border-radius:10px;border:none;cursor:pointer;
+  font-size:13px;font-weight:600;font-family:var(--font);
+  background:#ff4444;color:#fff;transition:opacity .15s;
+}
+.ban-confirm-btn:hover{opacity:.85;}
+.ban-cancel-btn{
+  flex:1;padding:10px;border-radius:10px;border:1px solid #2a2a2a;cursor:pointer;
+  font-size:13px;font-weight:600;font-family:var(--font);
+  background:transparent;color:#888;transition:background .15s;
+}
+.ban-cancel-btn:hover{background:rgba(255,255,255,.03);}
+
+/* Appeal inbox */
+.founder-appeal-card{
+  background:rgba(255,255,255,.03);border:1px solid #1e1e1e;
+  border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:8px;
+}
+.founder-appeal-meta{display:flex;align-items:center;justify-content:space-between;}
+.founder-appeal-email{font-size:12px;font-weight:600;color:var(--text);}
+.founder-appeal-ts{font-size:11px;color:#444;}
+.founder-appeal-reason{font-size:12px;color:#888;border-left:2px solid #2a2a2a;padding-left:10px;}
+.founder-appeal-actions{display:flex;gap:6px;margin-top:4px;}
+.btn-accept{background:rgba(0,200,100,.15);color:#00c864;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);}
+.btn-reject{background:rgba(255,60,60,.15);color:#ff4444;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font);}
+
+.founder-empty{text-align:center;color:#333;font-size:13px;padding:32px 0;}
 </style>
 </head>
 <body>
@@ -849,6 +975,42 @@ textarea#user-input::placeholder{color:rgba(255,255,255,.2);}
 
 <div class="toast" id="toast"></div>
 
+<!-- ══════════════ FOUNDER PANEL ══════════════ -->
+<div id="founder-panel">
+  <div class="founder-sheet">
+    <div class="founder-header">
+      <div class="founder-title">
+        ⚙️ Founder Panel
+        <span class="founder-badge">FOUNDER</span>
+      </div>
+      <button class="founder-close" onclick="closeFounderPanel()">✕</button>
+    </div>
+    <div class="founder-tabs">
+      <button class="founder-tab active" onclick="switchFounderTab('users',this)">👥 Pengguna</button>
+      <button class="founder-tab" onclick="switchFounderTab('banned',this)">🚫 Diblokir</button>
+      <button class="founder-tab" onclick="switchFounderTab('appeals',this)">📨 Banding</button>
+    </div>
+    <div class="founder-body" id="founder-body">
+      <!-- Diisi oleh JS -->
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════ BAN MODAL ══════════════ -->
+<div id="ban-modal">
+  <div class="ban-sheet">
+    <div>
+      <div class="ban-title">🚫 Blokir Pengguna</div>
+      <div class="ban-subtitle" id="ban-target-label">email@example.com</div>
+    </div>
+    <textarea class="ban-input" id="ban-reason" placeholder="Alasan pemblokiran (akan dikirim ke email pengguna)..."></textarea>
+    <div class="ban-actions">
+      <button class="ban-cancel-btn" onclick="closeBanModal()">Batal</button>
+      <button class="ban-confirm-btn" onclick="confirmBan()">Blokir & Kirim Email</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ══════════════════════════════════
 // CONFIG
@@ -905,6 +1067,7 @@ function loginWithGoogle() {
         const info = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
           headers: { Authorization: `Bearer ${res.access_token}` }
         }).then(r => r.json());
+        localStorage.setItem('ma-google-token', res.access_token);
         setUser({ name: info.name, email: info.email, picture: info.picture });
       }
     }
@@ -917,6 +1080,23 @@ function demoLogin() {
 }
 
 function setUser(user) {
+  // Cek apakah user dibanned
+  const banned = JSON.parse(localStorage.getItem('ma-banned-users') || '[]');
+  if (banned.some(b => b.email === user.email)) {
+    localStorage.removeItem('ma-user');
+    localStorage.removeItem('ma-google-token');
+    setTimeout(() => {
+      alert('Akun kamu telah diblokir oleh admin MA Studio.\nBuka ' + location.origin + '?appeal=1 untuk mengajukan banding.');
+    }, 300);
+    return;
+  }
+  // Daftarkan ke daftar global
+  const allUsers = JSON.parse(localStorage.getItem('ma-all-users') || '[]');
+  if (!allUsers.find(u => u.email === user.email)) {
+    allUsers.push({ name: user.name, email: user.email, picture: user.picture || '', joinedAt: new Date().toISOString() });
+    localStorage.setItem('ma-all-users', JSON.stringify(allUsers));
+  }
+
   currentUser = user;
   localStorage.setItem('ma-user', JSON.stringify(user));
 
@@ -947,10 +1127,16 @@ function setUser(user) {
   document.getElementById('app').classList.add('visible');
 
   renderHistoryList();
+
+  // Tampilkan tombol Founder jika email cocok
+  if (typeof FOUNDER_EMAILS !== 'undefined' && FOUNDER_EMAILS.includes(user.email)) {
+    setTimeout(ensureFounderBtn, 100);
+  }
 }
 
 function logout() {
   localStorage.removeItem('ma-user');
+  localStorage.removeItem('ma-google-token');
   currentUser = null;
   history = [];
   pendingImages = [];
@@ -992,8 +1178,24 @@ function clearHistory() {
 // INIT
 // ══════════════════════════════════
 window.addEventListener('DOMContentLoaded', () => {
-  const saved = localStorage.getItem('ma-user');
-  if (saved) setUser(JSON.parse(saved));
+  // Cek apakah ada sesi Google yang masih valid (token disimpan)
+  const savedToken = localStorage.getItem('ma-google-token');
+  const savedUser = localStorage.getItem('ma-user');
+  if (savedToken && savedUser) {
+    // Verifikasi token masih valid ke Google
+    fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${savedToken}` }
+    }).then(r => {
+      if (r.ok) return r.json();
+      throw new Error('token expired');
+    }).then(info => {
+      setUser({ name: info.name, email: info.email, picture: info.picture });
+    }).catch(() => {
+      // Token expired — hapus dan paksa login ulang
+      localStorage.removeItem('ma-google-token');
+      localStorage.removeItem('ma-user');
+    });
+  }
 
   const ta = document.getElementById('user-input');
   ta.addEventListener('input', () => {
@@ -1376,6 +1578,249 @@ function showToast(msg) {
 // ══════════════════════════════════
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
+
+// ══════════════════════════════════
+// FOUNDER PANEL
+// ══════════════════════════════════
+// Email founder — ganti dengan email Google akun kamu
+const FOUNDER_EMAILS = ['muhamadandisaputra2005@gmail.com'];
+
+let founderBanTarget = null;
+let founderCurrentTab = 'users';
+
+// Data disimpan di localStorage (production: ganti ke server/Firebase)
+function getUsers() { return JSON.parse(localStorage.getItem('ma-all-users') || '[]'); }
+function getBanned() { return JSON.parse(localStorage.getItem('ma-banned-users') || '[]'); }
+function getAppeals() { return JSON.parse(localStorage.getItem('ma-appeals') || '[]'); }
+function saveUsers(d) { localStorage.setItem('ma-all-users', JSON.stringify(d)); }
+function saveBanned(d) { localStorage.setItem('ma-banned-users', JSON.stringify(d)); }
+function saveAppeals(d) { localStorage.setItem('ma-appeals', JSON.stringify(d)); }
+
+// Hook founder dipanggil dari setUser langsung
+
+function ensureFounderBtn() {
+  if (document.getElementById('founder-sidebar-btn')) return;
+  const footer = document.querySelector('.sidebar-footer');
+  const btn = document.createElement('button');
+  btn.id = 'founder-sidebar-btn';
+  btn.className = 'new-chat-btn';
+  btn.style.cssText = 'margin:0 10px 10px;color:#ffb400;border-color:rgba(255,180,0,.3);';
+  btn.innerHTML = '⚙️ Founder Panel';
+  btn.onclick = openFounderPanel;
+  footer.insertBefore(btn, footer.firstChild);
+}
+
+function openFounderPanel() {
+  closeSidebar();
+  if (!currentUser || !FOUNDER_EMAILS.includes(currentUser.email)) {
+    showToast('Akses ditolak');
+    return;
+  }
+  document.getElementById('founder-panel').classList.add('open');
+  renderFounderTab('users');
+}
+
+function closeFounderPanel() {
+  document.getElementById('founder-panel').classList.remove('open');
+}
+
+function switchFounderTab(tab, el) {
+  founderCurrentTab = tab;
+  document.querySelectorAll('.founder-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  renderFounderTab(tab);
+}
+
+function renderFounderTab(tab) {
+  const body = document.getElementById('founder-body');
+  body.innerHTML = '';
+
+  if (tab === 'users') {
+    const users = getUsers();
+    const banned = getBanned();
+
+    // Search bar
+    const search = document.createElement('input');
+    search.className = 'founder-search';
+    search.placeholder = '🔍 Cari nama atau email...';
+    search.oninput = () => renderUserList(users, banned, search.value.toLowerCase(), body, listWrap);
+    body.appendChild(search);
+
+    const listWrap = document.createElement('div');
+    listWrap.style.display = 'flex';
+    listWrap.style.flexDirection = 'column';
+    listWrap.style.gap = '8px';
+    body.appendChild(listWrap);
+    renderUserList(users, banned, '', body, listWrap);
+
+  } else if (tab === 'banned') {
+    const banned = getBanned();
+    if (banned.length === 0) {
+      body.innerHTML = '<div class="founder-empty">Tidak ada akun yang diblokir</div>';
+      return;
+    }
+    banned.forEach(u => {
+      body.appendChild(buildUserCard(u, true));
+    });
+
+  } else if (tab === 'appeals') {
+    const appeals = getAppeals();
+    if (appeals.length === 0) {
+      body.innerHTML = '<div class="founder-empty">Belum ada banding masuk</div>';
+      return;
+    }
+    appeals.forEach((ap, i) => {
+      const card = document.createElement('div');
+      card.className = 'founder-appeal-card';
+      card.innerHTML = `
+        <div class="founder-appeal-meta">
+          <span class="founder-appeal-email">${ap.email}</span>
+          <span class="founder-appeal-ts">${new Date(ap.ts).toLocaleDateString('id-ID')}</span>
+        </div>
+        <div class="founder-appeal-reason">${ap.message || '(tidak ada pesan)'}</div>
+        <div class="founder-appeal-actions">
+          <button class="btn-accept" onclick="acceptAppeal(${i})">✓ Terima & Unban</button>
+          <button class="btn-reject" onclick="rejectAppeal(${i})">✕ Tolak</button>
+        </div>`;
+      body.appendChild(card);
+    });
+  }
+}
+
+function renderUserList(users, banned, query, body, listWrap) {
+  listWrap.innerHTML = '';
+  const bannedEmails = banned.map(b => b.email);
+  const filtered = users.filter(u =>
+    u.name.toLowerCase().includes(query) || u.email.toLowerCase().includes(query)
+  );
+  if (filtered.length === 0) {
+    listWrap.innerHTML = '<div class="founder-empty">Tidak ada pengguna ditemukan</div>';
+    return;
+  }
+  filtered.forEach(u => {
+    listWrap.appendChild(buildUserCard(u, bannedEmails.includes(u.email)));
+  });
+}
+
+function buildUserCard(u, isBanned) {
+  const card = document.createElement('div');
+  card.className = 'founder-user-card';
+
+  const avatarHtml = u.picture
+    ? `<img src="${u.picture}" onerror="this.style.display='none';this.parentElement.textContent='${u.name.charAt(0).toUpperCase()}'"/>`
+    : u.name.charAt(0).toUpperCase();
+
+  card.innerHTML = `
+    <div class="founder-user-avatar">${avatarHtml}</div>
+    <div class="founder-user-info">
+      <div class="founder-user-name">${u.name}</div>
+      <div class="founder-user-email">${u.email}</div>
+      <span class="founder-user-status ${isBanned ? 'status-banned' : 'status-active'}">${isBanned ? '🚫 Diblokir' : '✓ Aktif'}</span>
+    </div>
+    <div class="founder-user-actions">
+      ${isBanned
+        ? `<button class="founder-action-btn btn-unban" onclick="unbanUser('${u.email}')">Unban</button>`
+        : `<button class="founder-action-btn btn-ban" onclick="openBanModal('${u.email}','${u.name}')">Ban</button>`
+      }
+    </div>`;
+  return card;
+}
+
+function openBanModal(email, name) {
+  founderBanTarget = { email, name };
+  document.getElementById('ban-target-label').textContent = `${name} · ${email}`;
+  document.getElementById('ban-reason').value = '';
+  document.getElementById('ban-modal').classList.add('open');
+}
+
+function closeBanModal() {
+  document.getElementById('ban-modal').classList.remove('open');
+  founderBanTarget = null;
+}
+
+function confirmBan() {
+  if (!founderBanTarget) return;
+  const reason = document.getElementById('ban-reason').value.trim();
+  if (!reason) { showToast('Masukkan alasan pemblokiran'); return; }
+
+  const banned = getBanned();
+  if (!banned.find(b => b.email === founderBanTarget.email)) {
+    banned.push({ ...founderBanTarget, reason, bannedAt: new Date().toISOString() });
+    saveBanned(banned);
+  }
+
+  // Simulasi kirim email (tampilkan info — real email butuh backend/EmailJS)
+  showToast(`✓ ${founderBanTarget.name} diblokir. Email notifikasi dikirim.`);
+  console.log(`[MA BAN EMAIL] To: ${founderBanTarget.email}\nAlasan: ${reason}\nLink banding: ${location.origin}?appeal=1`);
+
+  closeBanModal();
+  renderFounderTab(founderCurrentTab);
+}
+
+function unbanUser(email) {
+  if (!confirm(`Unban ${email}?`)) return;
+  const banned = getBanned().filter(b => b.email !== email);
+  saveBanned(banned);
+  showToast(`✓ ${email} sudah di-unban`);
+  renderFounderTab(founderCurrentTab);
+}
+
+function acceptAppeal(i) {
+  const appeals = getAppeals();
+  const ap = appeals[i];
+  unbanUser(ap.email);
+  appeals.splice(i, 1);
+  saveAppeals(appeals);
+  showToast(`✓ Banding diterima, ${ap.email} di-unban`);
+  renderFounderTab('appeals');
+}
+
+function rejectAppeal(i) {
+  if (!confirm('Tolak banding ini?')) return;
+  const appeals = getAppeals();
+  appeals.splice(i, 1);
+  saveAppeals(appeals);
+  showToast('Banding ditolak');
+  renderFounderTab('appeals');
+}
+
+// ── Form banding (untuk user yang kena ban) ──
+// Panggil dari URL: ?appeal=1
+window.addEventListener('DOMContentLoaded', () => {
+  if (location.search.includes('appeal=1')) {
+    showAppealForm();
+  }
+});
+
+function showAppealForm() {
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed;inset:0;z-index:700;background:rgba(0,0,0,.9);display:flex;align-items:center;justify-content:center;padding:16px;';
+  overlay.innerHTML = `
+    <div style="width:100%;max-width:400px;background:#111;border:1px solid #2a2a2a;border-radius:16px;padding:24px;display:flex;flex-direction:column;gap:14px;">
+      <div style="font-size:15px;font-weight:700;">📨 Ajukan Banding</div>
+      <div style="font-size:12px;color:#555;">Akun kamu mungkin diblokir. Ajukan banding di bawah ini.</div>
+      <input id="appeal-email" class="ban-input" style="min-height:auto;resize:none;" placeholder="Email Google kamu" type="email"/>
+      <textarea id="appeal-msg" class="ban-input" placeholder="Jelaskan alasan kamu mengajukan banding..."></textarea>
+      <button onclick="submitAppeal()" class="ban-confirm-btn" style="background:var(--accent);">Kirim Banding</button>
+    </div>`;
+  document.body.appendChild(overlay);
+}
+
+function submitAppeal() {
+  const email = document.getElementById('appeal-email').value.trim();
+  const msg = document.getElementById('appeal-msg').value.trim();
+  if (!email || !msg) { showToast('Lengkapi semua field'); return; }
+
+  const appeals = getAppeals();
+  if (appeals.find(a => a.email === email)) {
+    showToast('Banding sudah pernah dikirim');
+    return;
+  }
+  appeals.push({ email, message: msg, ts: Date.now() });
+  saveAppeals(appeals);
+  showToast('✓ Banding berhasil dikirim ke admin!');
+  setTimeout(() => location.href = location.pathname, 1500);
 }
 </script>
 </body>
