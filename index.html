@@ -10,7 +10,7 @@
 <link rel="manifest" href="manifest.json"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/lua.min.js"></script>
@@ -33,7 +33,7 @@
   --radius:14px;
   --radius-sm:9px;
   --sidebar:260px;
-  --font:'Inter',sans-serif;
+  --font:'Plus Jakarta Sans',sans-serif;
   --accent:#7c6dff;
 }
 
@@ -431,24 +431,23 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
 .msg-content pre{
   background:#0f0f0f;border:1px solid var(--border);
   border-radius:var(--radius-sm);
-  overflow:auto;
+  overflow-x:auto;
   margin:12px 0;position:relative;
-  display:flex;
+  display:block;
+  max-width:100%;
 }
 .msg-content pre .line-numbers{
-  display:flex;flex-direction:column;
-  padding:14px 10px;
-  background:#0a0a0a;border-right:1px solid var(--border);
-  color:var(--text-3);font-size:12px;
-  font-family:'JetBrains Mono','Fira Mono',monospace;
-  line-height:1.6;user-select:none;flex-shrink:0;
-  text-align:right;min-width:36px;
+  display:none;
 }
 .msg-content pre code{
-  font-size:13px;font-family:'JetBrains Mono','Fira Mono',monospace;
+  font-size:12.5px;font-family:'JetBrains Mono','Fira Mono',monospace;
   padding:14px;display:block;
-  white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;
-  line-height:1.6;flex:1;min-width:0;
+  white-space:pre;
+  word-break:normal;
+  overflow-wrap:normal;
+  line-height:1.6;
+  overflow-x:auto;
+  min-width:0;
 }
 .msg-content code:not(pre code){
   background:var(--panel);color:#c8b8ff;padding:2px 6px;
@@ -465,9 +464,15 @@ html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--f
   background:var(--panel);border:1px solid var(--border);
   color:var(--text-3);font-size:11px;padding:3px 8px;
   border-radius:5px;cursor:pointer;font-family:var(--font);
-  transition:color .15s;
+  transition:color .15s;z-index:2;
 }
 .copy-code-btn:hover{color:var(--text);}
+.code-lang{
+  position:absolute;top:8px;left:14px;
+  font-size:10px;font-weight:600;color:var(--text-3);
+  font-family:var(--font);text-transform:uppercase;letter-spacing:.5px;
+  pointer-events:none;
+}
 
 /* typing */
 .typing-indicator{display:flex;gap:4px;align-items:center;padding:6px 0;}
@@ -1486,32 +1491,25 @@ async function appendAIMessage(text) {
   }
   contentEl.innerHTML = rendered;
 
-  // Highlight code blocks + nomor baris
+  // Highlight code blocks
   wrap.querySelectorAll('pre code').forEach(block => {
     hljs.highlightElement(block);
     const pre = block.parentElement;
-
-    // Tambah nomor baris
-    const lines = block.innerText.split('\n');
-    const lineNums = document.createElement('div');
-    lineNums.className = 'line-numbers';
-    lines.forEach((_, i) => {
-      const span = document.createElement('span');
-      span.textContent = i + 1;
-      lineNums.appendChild(span);
-    });
-    pre.insertBefore(lineNums, block);
+    pre.style.position = 'relative';
+    pre.style.paddingTop = '36px'; // ruang untuk label + tombol salin
 
     // Tombol salin
-    const btn = document.createElement('button');
-    btn.className = 'copy-code-btn';
-    btn.textContent = 'salin';
-    btn.onclick = () => {
-      navigator.clipboard.writeText(block.innerText);
-      btn.textContent = 'tersalin!';
-      setTimeout(() => btn.textContent = 'salin', 1500);
-    };
-    pre.appendChild(btn);
+    if (!pre.querySelector('.copy-code-btn')) {
+      const btn = document.createElement('button');
+      btn.className = 'copy-code-btn';
+      btn.textContent = 'salin';
+      btn.onclick = () => {
+        navigator.clipboard.writeText(block.innerText);
+        btn.textContent = '✓ tersalin';
+        setTimeout(() => btn.textContent = 'salin', 1500);
+      };
+      pre.appendChild(btn);
+    }
   });
 
   // Logo pop-in di respon terbaru
@@ -1541,8 +1539,12 @@ function removeEl(id) { document.getElementById(id)?.remove(); }
 // MARKDOWN RENDERER
 // ══════════════════════════════════
 function renderMd(text) {
-  text = text.replace(/```(\w*)\n?([\s\S]*?)```/g, (_, lang, code) =>
-    `<pre><code class="${lang}">${escHtml(code.trim())}</code></pre>`);
+  // Code block dulu sebelum proses lainnya
+  text = text.replace(/```(\w*)\r?\n?([\s\S]*?)```/g, (_, lang, code) => {
+    const escaped = escHtml(code.trim());
+    const label = lang ? `<span class="code-lang">${lang}</span>` : '';
+    return `<pre>${label}<code class="${lang || 'plaintext'}">${escaped}</code></pre>`;
+  });
   text = text.replace(/`([^`\n]+)`/g, '<code>$1</code>');
   text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
   text = text.replace(/\*(.*?)\*/g, '<em>$1</em>');
