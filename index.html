@@ -532,7 +532,32 @@ textarea#user-input::placeholder{color:rgba(255,255,255,.2);}
   display:flex;align-items:center;justify-content:space-between;
   padding:6px 10px 8px;
 }
-.input-left{display:flex;gap:4px;}
+.input-left{display:flex;gap:4px;align-items:center;}
+
+/* Upload menu */
+.upload-menu-wrap{position:relative;}
+.upload-menu{
+  position:absolute;bottom:calc(100% + 10px);left:0;
+  background:#161616;border:1px solid #2a2a2a;
+  border-radius:14px;padding:6px;
+  display:none;flex-direction:column;gap:2px;
+  min-width:210px;
+  box-shadow:0 8px 32px rgba(0,0,0,.6);
+  z-index:100;
+}
+.upload-menu.open{display:flex;}
+.upload-menu-item{
+  display:flex;align-items:center;gap:12px;
+  background:none;border:none;cursor:pointer;
+  padding:10px 12px;border-radius:10px;
+  text-align:left;width:100%;
+  transition:background .12s;font-family:var(--font);
+  color:var(--text);
+}
+.upload-menu-item:hover{background:rgba(255,255,255,.06);}
+.upload-menu-icon{font-size:20px;flex-shrink:0;}
+.upload-menu-label{font-size:13px;font-weight:600;margin-bottom:1px;}
+.upload-menu-desc{font-size:11px;color:#555;}
 
 /* Upload btn pakai + bukan emoji */
 .upload-btn{
@@ -964,8 +989,27 @@ textarea#user-input::placeholder{color:rgba(255,255,255,.2);}
         <textarea id="user-input" placeholder="Tanya MA AI..." rows="1"></textarea>
         <div class="input-actions">
           <div class="input-left">
-            <button class="upload-btn" onclick="document.getElementById('file-input').click()" title="Upload gambar">+</button>
+            <div class="upload-menu-wrap" id="upload-menu-wrap">
+              <button class="upload-btn" onclick="toggleUploadMenu()" id="upload-plus-btn" title="Upload">+</button>
+              <div class="upload-menu" id="upload-menu">
+                <button class="upload-menu-item" onclick="document.getElementById('file-input').click();closeUploadMenu()">
+                  <span class="upload-menu-icon">🖼️</span>
+                  <div>
+                    <div class="upload-menu-label">Foto / Gambar</div>
+                    <div class="upload-menu-desc">JPG, PNG, WEBP, GIF</div>
+                  </div>
+                </button>
+                <button class="upload-menu-item" onclick="document.getElementById('code-file-input').click();closeUploadMenu()">
+                  <span class="upload-menu-icon">📄</span>
+                  <div>
+                    <div class="upload-menu-label">File Kode</div>
+                    <div class="upload-menu-desc">Lua, JS, Python, dll</div>
+                  </div>
+                </button>
+              </div>
+            </div>
             <input type="file" id="file-input" accept="image/*" multiple onchange="handleImageUpload(this)"/>
+            <input type="file" id="code-file-input" accept=".lua,.luau,.js,.ts,.py,.html,.css,.json,.txt,.md,.java,.cpp,.c,.cs,.php,.rb,.go,.rs,.swift,.kt" multiple onchange="handleCodeFileUpload(this)"/>
           </div>
           <button class="send-btn" id="send-btn" onclick="sendMessage()">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="19" x2="12" y2="5"/><polyline points="5 12 12 5 19 12"/></svg>
@@ -1253,7 +1297,58 @@ function selectModel(id, label) {
 // ══════════════════════════════════
 // IMAGE UPLOAD
 // ══════════════════════════════════
-function handleImageUpload(input) {
+let pendingFiles = []; // code files
+
+function toggleUploadMenu() {
+  const menu = document.getElementById('upload-menu');
+  menu.classList.toggle('open');
+}
+
+function closeUploadMenu() {
+  document.getElementById('upload-menu')?.classList.remove('open');
+}
+
+// Tutup menu kalau klik di luar
+document.addEventListener('click', e => {
+  const wrap = document.getElementById('upload-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) closeUploadMenu();
+});
+
+function handleCodeFileUpload(input) {
+  Array.from(input.files).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      pendingFiles.push({ name: file.name, content: e.target.result });
+      renderFilePreviews();
+    };
+    reader.readAsText(file);
+  });
+  input.value = '';
+}
+
+function renderFilePreviews() {
+  let wrap = document.getElementById('file-preview-wrap');
+  if (!wrap) {
+    wrap = document.createElement('div');
+    wrap.id = 'file-preview-wrap';
+    wrap.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;padding:8px 14px 0;';
+    document.getElementById('img-preview-wrap').insertAdjacentElement('afterend', wrap);
+  }
+  wrap.innerHTML = '';
+  if (pendingFiles.length === 0) return;
+  pendingFiles.forEach((f, i) => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    const chip = document.createElement('div');
+    chip.style.cssText = 'display:flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:5px 10px;font-size:12px;color:#ccc;';
+    chip.innerHTML = `<span style="color:var(--accent)">📄</span><span>${f.name}</span><button onclick="removeFile(${i})" style="background:none;border:none;color:#555;cursor:pointer;font-size:13px;padding:0 0 0 4px;">✕</button>`;
+    wrap.appendChild(chip);
+  });
+}
+
+function removeFile(i) {
+  pendingFiles.splice(i, 1);
+  renderFilePreviews();
+}
   Array.from(input.files).forEach(file => {
     const reader = new FileReader();
     reader.onload = e => {
@@ -1290,8 +1385,9 @@ function newChat() {
   if (history.length > 0) saveCurrentChat();
   history = [];
   pendingImages = [];
-  currentChatId = null;
+  pendingFiles = [];
   renderImagePreviews();
+  renderFilePreviews();
   document.getElementById('chat').innerHTML = '';
   rebuildWelcome();
   closeSidebar();
@@ -1365,11 +1461,14 @@ function rebuildWelcome() {
 async function sendMessage() {
   const ta = document.getElementById('user-input');
   const text = ta.value.trim();
-  if ((!text && pendingImages.length === 0) || isLoading) return;
+  if ((!text && pendingImages.length === 0 && pendingFiles.length === 0) || isLoading) return;
 
   const imgs = [...pendingImages];
+  const files = [...pendingFiles];
   pendingImages = [];
+  pendingFiles = [];
   renderImagePreviews();
+  renderFilePreviews();
 
   const welcome = document.getElementById('welcome');
   if (welcome) welcome.remove();
@@ -1380,22 +1479,35 @@ async function sendMessage() {
   isLoading = true;
   document.getElementById('send-btn').disabled = true;
 
-  appendUserMessage(text, imgs);
+  appendUserMessage(text, imgs, files);
 
-  let userContent;
-  if (imgs.length > 0) {
-    userContent = [];
-    imgs.forEach(img => {
-      const b64 = img.dataUrl.split(',')[1];
-      const mime = img.file.type || 'image/png';
-      userContent.push({ type: 'image', source: { type: 'base64', media_type: mime, data: b64 } });
+  let userContent = [];
+
+  // Lampirkan file kode sebagai text block
+  files.forEach(f => {
+    const ext = f.name.split('.').pop().toLowerCase();
+    userContent.push({
+      type: 'text',
+      text: `\`\`\`${ext}\n// File: ${f.name}\n${f.content}\n\`\`\``
     });
-    if (text) userContent.push({ type: 'text', text });
-  } else {
-    userContent = text;
-  }
+  });
 
-  history.push({ role: 'user', content: userContent });
+  // Lampirkan gambar
+  imgs.forEach(img => {
+    const b64 = img.dataUrl.split(',')[1];
+    const mime = img.file.type || 'image/png';
+    userContent.push({ type: 'image', source: { type: 'base64', media_type: mime, data: b64 } });
+  });
+
+  // Pesan teks user
+  if (text) userContent.push({ type: 'text', text });
+
+  // Kalau hanya teks biasa, kirim sebagai string
+  if (userContent.length === 1 && userContent[0].type === 'text' && imgs.length === 0 && files.length === 0) {
+    history.push({ role: 'user', content: text });
+  } else {
+    history.push({ role: 'user', content: userContent });
+  }
 
   const typingId = appendTyping();
 
@@ -1433,16 +1545,21 @@ async function sendMessage() {
 // ══════════════════════════════════
 // RENDER MESSAGES
 // ══════════════════════════════════
-function appendUserMessage(text, imgs) {
+function appendUserMessage(text, imgs, files = []) {
   const chat = document.getElementById('chat');
   const wrap = document.createElement('div');
   wrap.className = 'msg-wrap user-wrap';
 
   let imgHtml = imgs.map(i => `<img class="chat-image" src="${i.dataUrl}" alt="upload"/>`).join('');
+  let fileHtml = files.map(f => `
+    <div style="display:inline-flex;align-items:center;gap:6px;background:#1a1a1a;border:1px solid #2a2a2a;border-radius:8px;padding:5px 10px;font-size:12px;color:#aaa;margin-bottom:6px;">
+      <span style="color:var(--accent)">📄</span>${escHtml(f.name)}
+    </div>`).join('');
 
   wrap.innerHTML = `
     <div class="msg-inner" style="justify-content:flex-end;align-items:flex-end">
       <div class="msg-content user-content">
+        ${fileHtml}
         ${imgHtml}
         ${text ? escHtml(text).replace(/\n/g,'<br>') : ''}
       </div>
